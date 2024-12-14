@@ -1,80 +1,63 @@
-import React from 'react'
 import CharacterCard from '../components/CharacterCard'
 import classes from '../styles/HomePage.module.css'
 import Pagination from '../components/Pagination'
+import { useEffect, useState } from 'react'
 
-class HomePage extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      characters: [],
-      numberOfPages: 1,
-      currentPage: 1,
-    }
-  }
+const HomePage = () => {
+  const [characters, setCharacters] = useState([])
+  const [numberOfPages, setNumberOfPages] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
 
-  getCharacters = async () => {
+  const getCharacters = async () => {
     try {
-      const response = await fetch(
-        `https://rickandmortyapi.com/api/character?page=${this.state.currentPage}`
-      )
+      const response = await fetch(`https://rickandmortyapi.com/api/character?page=${currentPage}`)
       if (response.ok) {
         const data = await response.json()
-        this.setState({
-          characters: data.results,
-          numberOfPages: data.info.pages,
-        })
+        setCharacters(data.results)
+        setNumberOfPages(data.info.pages)
       }
     } catch (error) {
       console.log(error)
     }
   }
 
-  componentDidMount() {
-    this.getCharacters()
-  }
+  useEffect(() => {
+    getCharacters()
+  }, [])
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.currentPage !== this.state.currentPage) {
-      this.getCharacters()
+  useEffect(() => {
+    getCharacters()
+  }, [currentPage])
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prevCurrentPage => prevCurrentPage - 1)
     }
   }
 
-  handlePreviousPage = () => {
-    if (this.state.currentPage > 1) {
-      this.setState(prevState => ({
-        currentPage: prevState.currentPage - 1,
-      }))
+  const handleNextPage = () => {
+    if (currentPage < numberOfPages) {
+      setCurrentPage(prevCurrentPage => prevCurrentPage + 1)
     }
   }
 
-  handleNextPage = () => {
-    if (this.state.currentPage < this.state.numberOfPages) {
-      this.setState(prevState => ({
-        currentPage: prevState.currentPage + 1,
-      }))
-    }
-  }
-
-  render() {
-    return (
-      <>
-        <ul className={classes.listCtn}>
-          {this.state.characters.map(character => (
-            <li key={character.id}>
-              <CharacterCard character={character} />
-            </li>
-          ))}
-        </ul>
-        <Pagination
-          currentPage={this.state.currentPage}
-          numberOfPages={this.state.numberOfPages}
-          handlePreviousPage={this.handlePreviousPage}
-          handleNextPage={this.handleNextPage}
-        />
-      </>
-    )
-  }
+  return (
+    <>
+      <ul className={classes.listCtn}>
+        {characters.map(character => (
+          <li key={character.id}>
+            <CharacterCard character={character} />
+          </li>
+        ))}
+      </ul>
+      <Pagination
+        currentPage={currentPage}
+        numberOfPages={numberOfPages}
+        handlePreviousPage={handlePreviousPage}
+        handleNextPage={handleNextPage}
+      />
+    </>
+  )
 }
 
 export default HomePage

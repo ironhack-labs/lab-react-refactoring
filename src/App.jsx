@@ -1,29 +1,20 @@
-import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import NotFoundPage from './pages/NotFoundPage'
 
-class App extends React.Component {
-  render() {
-    return (
-      <>
-        <Navbar />
-        <Switch>
-          <Route exact path='/'>
-            <HomePage />
-          </Route>
-          <Route path='/about'>
-            <AboutPage />
-          </Route>
-          <Route path='/*'>
-            <NotFoundPage />
-          </Route>
-        </Switch>
-      </>
-    )
-  }
+const App = () => {
+  return (
+    <>
+      <Navbar />
+      <Routes>
+        <Route path='/' element={<HomePage />} />
+        <Route path='/about' element={<AboutPage />} />
+        <Route path='*' element={<NotFoundPage />} />
+      </Routes>
+    </>
+  )
 }
 
 export default App
